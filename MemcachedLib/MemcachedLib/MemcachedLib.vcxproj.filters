@@ -30,6 +30,12 @@
     <ClInclude Include="Event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MemcachedDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MemcachedMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReadWriteLock.cpp">
