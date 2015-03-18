@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemcachedLib", "MemcachedLib\MemcachedLib.vcxproj", "{27A61B98-3A44-4094-B629-02D16ED23515}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemcachedUnitTests", "MemcachedUnitTests\MemcachedUnitTests.vcxproj", "{FC4A8FB2-8EEB-4147-8DF3-D922534E100C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -15,6 +17,10 @@ Global
 		{27A61B98-3A44-4094-B629-02D16ED23515}.Debug|Win32.Build.0 = Debug|Win32
 		{27A61B98-3A44-4094-B629-02D16ED23515}.Release|Win32.ActiveCfg = Release|Win32
 		{27A61B98-3A44-4094-B629-02D16ED23515}.Release|Win32.Build.0 = Release|Win32
+		{FC4A8FB2-8EEB-4147-8DF3-D922534E100C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FC4A8FB2-8EEB-4147-8DF3-D922534E100C}.Debug|Win32.Build.0 = Debug|Win32
+		{FC4A8FB2-8EEB-4147-8DF3-D922534E100C}.Release|Win32.ActiveCfg = Release|Win32
+		{FC4A8FB2-8EEB-4147-8DF3-D922534E100C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
