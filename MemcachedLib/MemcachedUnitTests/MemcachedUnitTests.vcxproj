@@ -14,6 +14,7 @@
     <ProjectGuid>{FC4A8FB2-8EEB-4147-8DF3-D922534E100C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>MemcachedUnitTests</RootNamespace>
+    <ProjectName>MemcacheUnitTests</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
