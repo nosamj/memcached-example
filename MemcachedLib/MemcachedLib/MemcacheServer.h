@@ -1,6 +1,6 @@
 #pragma once
-#ifndef MEMCACHED_MEMCACHEDSERVER_H_
-#define MEMCACHED_MEMCACHEDSERVER_H_
+#ifndef MEMCACHE_MEMCACHESERVER_H_
+#define MEMCACHE_MEMCACHESERVER_H_
 
 #include <string>
 #include <map>

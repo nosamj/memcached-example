@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _MEMCACHED_MUTEX_H_
-#define _MEMCACHED_MUTEX_H_
+#ifndef _MEMCACHE_MUTEX_H_
+#define _MEMCACHE_MUTEX_H_
 
 #include <mutex>
 

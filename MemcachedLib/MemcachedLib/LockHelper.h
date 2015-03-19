@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _MEMCACHED_LOCKHELPER_H_
-#define _MEMCACHED_LOCKHELPER_H_
+#ifndef _MEMCACHE_LOCKHELPER_H_
+#define _MEMCACHE_LOCKHELPER_H_
 
 #include "Mutex.h"
 

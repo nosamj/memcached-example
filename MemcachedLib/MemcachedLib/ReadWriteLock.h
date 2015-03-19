@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _MEMCACHED_READWRITELOCK_H_
-#define _MEMCACHED_READWRITELOCK_H_
+#ifndef _MEMCACHE_READWRITELOCK_H_
+#define _MEMCACHE_READWRITELOCK_H_
 
 #include <atomic>
 #include "Event.h"

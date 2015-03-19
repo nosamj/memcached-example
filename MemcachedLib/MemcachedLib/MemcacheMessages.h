@@ -1,6 +1,6 @@
 #pragma once
-#ifndef MEMACHED_MEMCACHEDMESSAGE_H_
-#define MEMACHED_MEMCACHEDMESSAGE_H_
+#ifndef MEMACHED_MEMCACHEMESSAGE_H_
+#define MEMACHED_MEMCACHEMESSAGE_H_
 
 namespace memcache
 {

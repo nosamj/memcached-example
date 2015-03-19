@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _MEMCACHED_EVENT_H_
-#define _MEMCACHED_EVENT_H_
+#ifndef _MEMCACHE_EVENT_H_
+#define _MEMCACHE_EVENT_H_
 
 namespace memcache
 {

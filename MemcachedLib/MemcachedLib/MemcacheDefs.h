@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _MEMCACHED_MEMCACHEDDEFS_H_
-#define _MEMCACHED_MEMCACHEDDEFS_H_
+#ifndef _MEMCACHE_MEMCACHEDEFS_H_
+#define _MEMCACHE_MEMCACHEDEFS_H_
 
 namespace memcache
 {
