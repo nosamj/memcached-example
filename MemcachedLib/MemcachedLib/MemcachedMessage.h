@@ -27,7 +27,7 @@ namespace memcached
 		const MessageHeader & GetHeader() const;
 		void SetHeader(MessageHeader & header);
 
-		bool BuildMessageWithPayload();
+		virtual bool BuildMessage();
 
 		unsigned char * GetKeyData();
 		const unsigned char * GetKeyData() const;
@@ -61,6 +61,30 @@ namespace memcached
 
 		unsigned long long GetCAS() const;
 		void SetCAS(unsigned long long val);
+	};
+
+	class GetRequest : public Message
+	{
+	public:
+		GetRequest();
+	};
+
+	class GetResponse : public Message
+	{
+	public:
+		GetResponse();
+	};
+
+	class SetRequest : public Message
+	{
+	public:
+		SetRequest();
+	};
+
+	class SetResponse : public Message
+	{
+	public:
+		SetResponse();
 	};
 }
 #endif

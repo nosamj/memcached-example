@@ -2,6 +2,7 @@
 #ifndef _MEMCACHED_READWRITELOCK_H_
 #define _MEMCACHED_READWRITELOCK_H_
 
+#include <atomic>
 #include "Event.h"
 #include "Mutex.h"
 
@@ -89,9 +90,8 @@ namespace memcached
 		IMutex * WriteMutex();
 
 	protected:
-		unsigned int _readCount; ///< tracks the number of readers.
+		std::atomic_uint _readCount; ///< tracks the number of readers.
 		unsigned int _writeCount; ///< tracks when the final write method done
-		Mutex _readMutex; ///< mutex for protecting the read count
 		Mutex _writeMutex; ///< mutex for allowing only one write thread
 		Event _readEvent; ///< signaled when all readers are done
 		Event _writeEvent; ///< signaled what write is compelte and unsignaled to prevent new readers.

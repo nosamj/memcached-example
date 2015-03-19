@@ -36,6 +36,12 @@
     <ClInclude Include="MemcachedMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MemcachedServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DataBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReadWriteLock.cpp">

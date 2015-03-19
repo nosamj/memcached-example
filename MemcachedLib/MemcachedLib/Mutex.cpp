@@ -2,23 +2,13 @@
 
 namespace memcached
 {
-	Mutex::Mutex()
-	{
-
-	}
-
-	Mutex::~Mutex()
-	{
-
-	}
-
 	void Mutex::Lock()
 	{
-
+		_mutex.lock();
 	}
 
 	void Mutex::Unlock()
 	{
-
+		_mutex.unlock();
 	}
 }

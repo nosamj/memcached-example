@@ -74,10 +74,12 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DataBuffer.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="LockHelper.h" />
     <ClInclude Include="MemcachedDefs.h" />
     <ClInclude Include="MemcachedMessage.h" />
+    <ClInclude Include="MemcachedServer.h" />
     <ClInclude Include="Mutex.h" />
     <ClInclude Include="ReadWriteLock.h" />
   </ItemGroup>

@@ -6,7 +6,6 @@ namespace memcached
 	ReadWriteLock::ReadWriteLock() 
 		: _readEvent(true, true),
 		_writeEvent(true, true),
-		_readCount(0),
 		_writeCount(0)
 	{
 		_readLock = new ReadLock(*this);
@@ -27,15 +26,11 @@ namespace memcached
 		// make sure there is no thread with the write lock
 		_writeEvent.Wait();
 
-		_readMutex.Lock();
 		++_readCount;
-		_readMutex.Unlock();
 	}
 
 	void ReadWriteLock::UnlockRead()
 	{
-		LockHelper myLock(_readMutex);
-
 		if (--_readCount == 0)
 		{
 			_readEvent.Set();
