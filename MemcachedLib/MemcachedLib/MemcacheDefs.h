@@ -2,7 +2,7 @@
 #ifndef _MEMCACHED_MEMCACHEDDEFS_H_
 #define _MEMCACHED_MEMCACHEDDEFS_H_
 
-namespace memcached
+namespace memcache
 {
 	static const int kMBPHeaderSize = 24;
 

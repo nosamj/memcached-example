@@ -4,7 +4,7 @@
 
 #include <mutex>
 
-namespace memcached
+namespace memcache
 {
 	class IMutex
 	{

@@ -2,7 +2,7 @@
 #ifndef MEMCACHED_DATABUFFER_H_
 #define MEMCACHED_DATABUFFER_H_
 
-namespace memcached
+namespace memcache
 {
 	class DataBuffer
 	{

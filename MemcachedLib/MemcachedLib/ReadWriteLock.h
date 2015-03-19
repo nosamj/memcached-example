@@ -6,7 +6,7 @@
 #include "Event.h"
 #include "Mutex.h"
 
-namespace memcached
+namespace memcache
 {
 	/**
 	 * Forward declaration for the ReadLock and WriteLock classes

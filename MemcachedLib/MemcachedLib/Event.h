@@ -2,7 +2,7 @@
 #ifndef _MEMCACHED_EVENT_H_
 #define _MEMCACHED_EVENT_H_
 
-namespace memcached
+namespace memcache
 {
 	class Event
 	{

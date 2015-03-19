@@ -1,6 +1,6 @@
 #include "Mutex.h"
 
-namespace memcached
+namespace memcache
 {
 	void Mutex::Lock()
 	{

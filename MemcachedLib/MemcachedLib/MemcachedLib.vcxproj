@@ -77,14 +77,15 @@
     <ClInclude Include="DataBuffer.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="LockHelper.h" />
-    <ClInclude Include="MemcachedDefs.h" />
-    <ClInclude Include="MemcachedMessage.h" />
-    <ClInclude Include="MemcachedServer.h" />
+    <ClInclude Include="MemcacheDefs.h" />
+    <ClInclude Include="MemcacheMessages.h" />
+    <ClInclude Include="MemcacheServer.h" />
     <ClInclude Include="Mutex.h" />
     <ClInclude Include="ReadWriteLock.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Event.cpp" />
+    <ClCompile Include="MemcacheMessages.cpp" />
     <ClCompile Include="Mutex.cpp" />
     <ClCompile Include="ReadWriteLock.cpp" />
   </ItemGroup>

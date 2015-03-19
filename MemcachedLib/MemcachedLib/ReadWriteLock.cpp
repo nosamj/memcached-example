@@ -1,7 +1,7 @@
 #include "ReadWriteLock.h"
 #include "LockHelper.h"
 
-namespace memcached
+namespace memcache
 {
 	ReadWriteLock::ReadWriteLock() 
 		: _readEvent(true, true),

@@ -1,6 +1,6 @@
 #include "Event.h"
 
-namespace memcached
+namespace memcache
 {
 	Event::Event(bool manualReset, bool initialState)
 	{

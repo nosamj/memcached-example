@@ -2,7 +2,7 @@
 #ifndef MEMACHED_MEMCACHEDMESSAGE_H_
 #define MEMACHED_MEMCACHEDMESSAGE_H_
 
-namespace memcached
+namespace memcache
 {
 	typedef struct MessageHeader
 	{

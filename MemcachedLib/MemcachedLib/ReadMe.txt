@@ -1,19 +1,19 @@
 ========================================================================
-    STATIC LIBRARY : MemcachedLib Project Overview
+    STATIC LIBRARY : MemcacheLib Project Overview
 ========================================================================
 
-AppWizard has created this MemcachedLib library project for you.
+AppWizard has created this MemcacheLib library project for you.
 
 No source files were created as part of your project.
 
 
-MemcachedLib.vcxproj
+MemcacheLib.vcxproj
     This is the main project file for VC++ projects generated using an Application Wizard.
     It contains information about the version of Visual C++ that generated the file, and
     information about the platforms, configurations, and project features selected with the
     Application Wizard.
 
-MemcachedLib.vcxproj.filters
+MemcacheLib.vcxproj.filters
     This is the filters file for VC++ projects generated using an Application Wizard. 
     It contains information about the association between the files in your project 
     and the filters. This association is used in the IDE to show grouping of files with

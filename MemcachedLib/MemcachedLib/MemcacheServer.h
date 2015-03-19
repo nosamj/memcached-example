@@ -7,13 +7,13 @@
 #include "ReadWriteLock.h"
 #include "DataBuffer.h"
 
-namespace memcached
+namespace memcache
 {
-	class MemcachedServer
+	class MemcacheServer
 	{
 	public:
-		MemcachedServer();
-		~MemcachedServer();
+		MemcacheServer();
+		~MemcacheServer();
 
 	protected:
 		typedef std::map<std::string, DataBuffer *> DataMap_t;

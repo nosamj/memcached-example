@@ -4,7 +4,7 @@
 
 #include "Mutex.h"
 
-namespace memcached
+namespace memcache
 {
 	class LockHelper
 	{
