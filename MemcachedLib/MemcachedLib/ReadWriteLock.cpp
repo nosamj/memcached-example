@@ -3,6 +3,36 @@
 
 namespace memcache
 {
+	/**
+	 * Helper class for using the LockHelper class to lock/unlock as a reader
+	 * of the ReadWriteLock class.
+	 */
+	class ReadLock : public IMutex
+	{
+	public:
+		ReadLock(ReadWriteLock & lock) : _lock(lock) {}
+		virtual void Lock() { _lock.LockRead(); }
+		virtual void Unlock() { _lock.UnlockRead(); }
+
+	protected:
+		ReadWriteLock & _lock;
+	};
+
+	/**
+	 * Helper class for using the LockHelper class to lock/unlock as a writer
+	 * of the ReadWriteLock class.
+	 */
+	class WriteLock : public IMutex
+	{
+	public:
+		WriteLock(ReadWriteLock & lock) : _lock(lock) {}
+		virtual void Lock() { _lock.LockWrite(); }
+		virtual void Unlock() { _lock.UnlockWrite(); }
+
+	protected:
+		ReadWriteLock & _lock;
+	};
+
 	ReadWriteLock::ReadWriteLock() 
 		: _readEvent(true, true),
 		_writeEvent(true, true),

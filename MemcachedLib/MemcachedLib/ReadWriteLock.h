@@ -8,40 +8,6 @@
 
 namespace memcache
 {
-	/**
-	 * Forward declaration for the ReadLock and WriteLock classes
-	 */
-	class ReadWriteLock;
-
-	/**
-	 * Helper class for using the LockHelper class to lock/unlock as a reader
-	 * of the ReadWriteLock class.
-	 */
-	class ReadLock : public IMutex
-	{
-	public:
-		ReadLock(ReadWriteLock & lock) : _lock(lock) {}
-		virtual void Lock() { _lock.LockRead(); }
-		virtual void Unlock() { _lock.UnlockRead(); }
-
-	protected:
-		ReadWriteLock & _lock;
-	};
-
-	/**
-	 * Helper class for using the LockHelper class to lock/unlock as a writer
-	 * of the ReadWriteLock class.
-	 */
-	class WriteLock : public IMutex
-	{
-	public:
-		WriteLock(ReadWriteLock & lock) : _lock(lock) {}
-		virtual void Lock() { _lock.LockWrite(); }
-		virtual void Unlock() { _lock.UnlockWrite(); }
-
-	protected:
-		ReadWriteLock & _lock;
-	};
 
 	/**
 	 * Class that allows for multiple read threads to access some
@@ -95,8 +61,8 @@ namespace memcache
 		Mutex _writeMutex; ///< mutex for allowing only one write thread
 		Event _readEvent; ///< signaled when all readers are done
 		Event _writeEvent; ///< signaled what write is compelte and unsignaled to prevent new readers.
-		ReadLock * _readLock;
-		WriteLock * _writeLock;
+		IMutex * _readLock;
+		IMutex * _writeLock;
 	};
 }
 #endif

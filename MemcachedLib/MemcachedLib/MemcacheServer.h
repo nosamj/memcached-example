@@ -6,17 +6,18 @@
 #include <map>
 #include "ReadWriteLock.h"
 #include "DataBuffer.h"
+#include "MemcacheMessages.h"
 
 namespace memcache
 {
-	class MemcacheServer
+	class MemcacheServer : public IMessageHandler
 	{
 	public:
 		MemcacheServer();
 		~MemcacheServer();
 
 	protected:
-		typedef std::map<std::string, DataBuffer *> DataMap_t;
+		typedef std::map<std::string, std::unique_ptr<DataBuffer> > DataMap_t;
 		DataMap_t _dataMap;
 		ReadWriteLock _mapLock;///< used to protect the cache
 	};

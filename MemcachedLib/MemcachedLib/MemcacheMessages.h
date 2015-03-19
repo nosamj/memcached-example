@@ -2,6 +2,10 @@
 #ifndef MEMACHED_MEMCACHEMESSAGE_H_
 #define MEMACHED_MEMCACHEMESSAGE_H_
 
+#include <memory>
+#include "MemcacheDefs.h"
+#include "DataBuffer.h"
+
 namespace memcache
 {
 	typedef struct MessageHeader
@@ -12,79 +16,63 @@ namespace memcache
 		unsigned char ExtrasLen;
 		unsigned char DataType;
 		unsigned short Status;
+		unsigned int TotalBodyLen;
 		unsigned int Opaque;
 		unsigned long long CAS;
+
+		MessageHeader();
+		size_t ParseFromBuffer(DataBuffer & buffer);
+		size_t WriteToBuffer(DataBuffer & buffer);
 	}MessageHeader;
 
-	class Message
+	class BaseMessage
 	{
 	public:
-		Message();
-		virtual ~Message();
-
-		bool AllocateMessage(unsigned int totalBodyLen);
+		BaseMessage();
+		BaseMessage(const std::shared_ptr<DataBuffer> & buffer);
+		virtual ~BaseMessage();
 
 		const MessageHeader & GetHeader() const;
-		void SetHeader(MessageHeader & header);
+		void SetHeader(const MessageHeader & header);
 
-		virtual bool BuildMessage();
-
-		unsigned char * GetKeyData();
-		const unsigned char * GetKeyData() const;
-
-		unsigned char * GetExtrasData();
-		const unsigned char * GetExtrasData() const;
-
-		unsigned char * GetValueData();
-		const unsigned char * GetValueData() const;
-
-		unsigned char GetMagic() const;
-		void SetMagic(unsigned char val);
-
-		unsigned char GetOpcode() const;
-		void SetOpcode(unsigned char val);
-
-		unsigned short GetKeyLen() const;
-		void SetKeyLen(unsigned short val);
-
-		unsigned char GetExtrasLen() const;
-		void SetExtrasLen(unsigned char val);
-
-		unsigned char GetDataType() const;
-		// not going to provide a setter for DataType since it has only one value of 0
-
-		unsigned short GetStatus() const;
-		void SetStatus(unsigned short val);
-
-		unsigned int GetOpaque() const;
-		void SetOpaque(unsigned int val);
-
-		unsigned long long GetCAS() const;
-		void SetCAS(unsigned long long val);
+	protected:
+		std::shared_ptr<DataBuffer> _buffer;
+		MessageHeader _baseHeader;
 	};
 
-	class GetRequest : public Message
+	class GetRequest : public BaseMessage
 	{
 	public:
 		GetRequest();
+		GetRequest(const std::shared_ptr<DataBuffer> & buffer);
 	};
 
-	class GetResponse : public Message
+	class GetResponse : public BaseMessage
 	{
 	public:
 		GetResponse();
+		GetResponse(const std::shared_ptr<DataBuffer> & buffer);
 	};
 
-	class SetRequest : public Message
+	class SetRequest : public BaseMessage
 	{
 	public:
 		SetRequest();
+		SetRequest(const std::shared_ptr<DataBuffer> & buffer);
 	};
 
-	class SetResponse : public Message
+	class SetResponse : public BaseMessage
 	{
 	public:
 		SetResponse();
+		SetResponse(const std::shared_ptr<DataBuffer> & buffer);
+	};
+
+	class IMessageHandler
+	{
+	public:
+		virtual void OnHandleRequest(BaseMessage * message, std::unique_ptr<BaseMessage> & response) = 0;
+		virtual void OnHandleResponse(BaseMessage * message) = 0;
 	};
 }
 #endif
