@@ -40,6 +40,7 @@ namespace memcache
 	{
 		_readLock = new ReadLock(*this);
 		_writeLock = new WriteLock(*this);
+		_readCount.store(0);
 	}
 
 	ReadWriteLock::~ReadWriteLock()
@@ -56,7 +57,10 @@ namespace memcache
 		// make sure there is no thread with the write lock
 		_writeEvent.Wait();
 
-		++_readCount;
+		if (_readCount++ == 0)
+		{
+			_readEvent.Reset();
+		}
 	}
 
 	void ReadWriteLock::UnlockRead()

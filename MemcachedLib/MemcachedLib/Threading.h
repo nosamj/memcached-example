@@ -30,6 +30,8 @@ namespace memcache
 			return _thread.joinable();
 		}
 
+		std::thread::id GetID() const { return _thread.get_id(); }
+
 	protected:
 		bool _shouldTerminate;
 		std::thread _thread;

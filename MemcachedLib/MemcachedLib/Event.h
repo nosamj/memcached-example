@@ -2,6 +2,8 @@
 #ifndef _MEMCACHE_EVENT_H_
 #define _MEMCACHE_EVENT_H_
 
+#include <WinSock2.h>
+
 namespace memcache
 {
 	class Event
@@ -12,6 +14,8 @@ namespace memcache
 		void Set();
 		void Reset();
 		void Wait();
+	protected:
+		HANDLE _handle;
 	};
 }
 #endif

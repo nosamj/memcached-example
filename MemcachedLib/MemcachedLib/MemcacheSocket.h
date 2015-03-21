@@ -21,6 +21,7 @@ namespace memcache
 	public:
 		MemcacheSocket();
 		MemcacheSocket(ISocketHandler * handler);
+		MemcacheSocket(SOCKET socket, ISocketHandler * handler);
 		~MemcacheSocket();
 		bool Listen(unsigned short port, ISocketHandler * handler);
 		bool Connect(const std::string & address, unsigned short port);
@@ -39,5 +40,10 @@ namespace memcache
 		bool _isListening;
 		unsigned int _sessionID;
 		ISocketHandler * _handler;
+		std::shared_ptr<DataBuffer>	_readBuffer;
+		std::unique_ptr<BaseMessage> _currentMsg;
+
+	protected:
+		void ReadData();
 	};
 }

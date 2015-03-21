@@ -11,6 +11,15 @@ namespace memcache
 	{
 	}
 
+	DataBuffer::DataBuffer(size_t len)
+		: _data(nullptr),
+		_bufferSize(0),
+		_writeOffset(0),
+		_readOffset(0)
+	{
+		this->Alloc(len);
+	}
+
 	DataBuffer::~DataBuffer()
 	{
 		this->Cleanup();

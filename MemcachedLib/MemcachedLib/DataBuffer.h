@@ -8,6 +8,7 @@ namespace memcache
 	{
 	public:
 		DataBuffer();
+		DataBuffer(size_t len);
 		~DataBuffer();
 
 		bool Alloc(size_t len);
