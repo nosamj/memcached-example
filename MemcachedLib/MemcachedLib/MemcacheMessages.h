@@ -35,10 +35,28 @@ namespace memcache
 
 		const MessageHeader & GetHeader() const;
 		void SetHeader(const MessageHeader & header);
+		void SetStatus(unsigned short status);
+		unsigned short GetStatus() const;
+		virtual bool Parse();
+		virtual bool Build();
+
+		std::string GetKey() const;
+		void SetKey(const std::string & key);
+
+		const DataBuffer * GetDataBuffer() const { return _buffer.get(); }
 
 	protected:
 		std::shared_ptr<DataBuffer> _buffer;
 		MessageHeader _baseHeader;
+		std::string _key;
+
+	protected:
+		virtual size_t WriteExtras();
+		virtual bool ReadExtras();
+		size_t WriteKey();
+		bool ReadKey();
+		virtual size_t WriteValue();
+		virtual bool ReadValue();
 	};
 
 	class GetRequest : public BaseMessage
@@ -46,11 +64,8 @@ namespace memcache
 	public:
 		GetRequest();
 		GetRequest(const std::shared_ptr<DataBuffer> & buffer);
-		void SetKey(const std::string & key);
-		std::string GetKey() const;
-
-	protected:
-		std::string _key;
+		virtual bool Parse();
+		virtual bool Build();
 	};
 
 	class GetResponse : public BaseMessage
@@ -58,6 +73,22 @@ namespace memcache
 	public:
 		GetResponse();
 		GetResponse(const std::shared_ptr<DataBuffer> & buffer);
+		virtual bool Parse();
+		virtual bool Build();
+		void SetValue(const DataBuffer & value) { _value = value; }
+		DataBuffer & GetValue() { return _value; }
+		void SetFlags(unsigned int flags) { _flags = flags; }
+		unsigned int GetFlags() const { return _flags; }
+
+	protected:
+		DataBuffer _value;
+		unsigned int _flags;
+
+	protected:
+		virtual size_t WriteExtras();
+		virtual bool ReadExtras();
+		virtual size_t WriteValue();
+		virtual bool ReadValue();
 	};
 
 	class SetRequest : public BaseMessage

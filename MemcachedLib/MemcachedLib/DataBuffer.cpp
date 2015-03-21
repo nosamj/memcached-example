@@ -126,7 +126,7 @@ namespace memcache
 	unsigned char DataBuffer::ReadByte()
 	{
 		unsigned char ret = 0;
-		if (this->IsValid() && ((_readOffset + 1) < _bufferSize))
+		if (this->IsValid() && ((_readOffset + 1) <= _bufferSize))
 		{
 			ret = _data[_readOffset++];
 		}
@@ -135,7 +135,7 @@ namespace memcache
 
 	bool DataBuffer::WriteByte(unsigned char byte)
 	{
-		if (this->IsValid() && ((_writeOffset + 1) < _bufferSize))
+		if (this->IsValid() && ((_writeOffset + 1) <= _bufferSize))
 		{
 			_data[_writeOffset++] = byte;
 
@@ -147,7 +147,7 @@ namespace memcache
 	unsigned short DataBuffer::ReadShort()
 	{
 		unsigned short ret = 0;
-		if (this->IsValid() && ((_readOffset + 2) < _bufferSize))
+		if (this->IsValid() && ((_readOffset + 2) <= _bufferSize))
 		{
 			ret = (_data[_readOffset] << 8) | _data[_readOffset + 1];
 
@@ -158,7 +158,7 @@ namespace memcache
 
 	bool DataBuffer::WriteShort(unsigned short val)
 	{
-		if (this->IsValid() && ((_writeOffset + 2) < _bufferSize))
+		if (this->IsValid() && ((_writeOffset + 2) <= _bufferSize))
 		{
 			_data[_writeOffset++] = (val >> 8);
 			_data[_writeOffset++] = val & 0xFF;
@@ -171,7 +171,7 @@ namespace memcache
 	unsigned int DataBuffer::ReadInt()
 	{
 		unsigned int ret = 0;
-		if (this->IsValid() && ((_readOffset + 4) < _bufferSize))
+		if (this->IsValid() && ((_readOffset + 4) <= _bufferSize))
 		{
 			ret = ((_data[_readOffset] << 24) | (_data[_readOffset + 1] << 16) | (_data[_readOffset + 2] << 8) | _data[_readOffset + 3]);
 
@@ -182,7 +182,7 @@ namespace memcache
 
 	bool DataBuffer::WriteInt(unsigned int val)
 	{
-		if (this->IsValid() && ((_writeOffset + 4) < _bufferSize))
+		if (this->IsValid() && ((_writeOffset + 4) <= _bufferSize))
 		{
 			_data[_writeOffset++] = (val >> 24) & 0xFF;
 			_data[_writeOffset++] = (val >> 16) & 0xFF;
@@ -197,7 +197,7 @@ namespace memcache
 	unsigned long long DataBuffer::ReadLongLong()
 	{
 		unsigned long long ret = 0;
-		if (this->IsValid() && ((_readOffset + 8) < _bufferSize))
+		if (this->IsValid() && ((_readOffset + 8) <= _bufferSize))
 		{
 			ret = ((unsigned long long)_data[_readOffset++] << 56);
 			ret |= ((unsigned long long)_data[_readOffset++] << 48);
@@ -213,7 +213,7 @@ namespace memcache
 
 	bool DataBuffer::WriteLongLong(unsigned long long val)
 	{
-		if (this->IsValid() && ((_writeOffset + 8) < _bufferSize))
+		if (this->IsValid() && ((_writeOffset + 8) <= _bufferSize))
 		{
 			_data[_writeOffset++] = (val >> 56) & 0xFF;
 			_data[_writeOffset++] = (val >> 48) & 0xFF;
@@ -234,7 +234,8 @@ namespace memcache
 		size_t numRead = std::min(numToRead, this->GetBytesLeftToRead());
 		if (numRead > 0)
 		{
-			memcpy(dest, _data, numRead);
+			memcpy(dest, &_data[_readOffset], numRead);
+			this->MoveReadForward(numRead);
 		}
 		return numRead;
 	}

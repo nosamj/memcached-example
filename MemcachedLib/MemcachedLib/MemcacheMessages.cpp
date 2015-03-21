@@ -53,6 +53,11 @@ namespace memcache
 	 */
 	BaseMessage::BaseMessage()
 	{
+		_buffer.reset(new DataBuffer(2048));
+	}
+
+	BaseMessage::BaseMessage(const std::shared_ptr<DataBuffer> & buffer) : _buffer(buffer)
+	{
 	}
 
 	BaseMessage::~BaseMessage()
@@ -70,6 +75,122 @@ namespace memcache
 		_baseHeader = header;
 	}
 
+	void BaseMessage::SetStatus(unsigned short status)
+	{
+		_baseHeader.Status = status;
+	}
+
+	unsigned short BaseMessage::GetStatus() const
+	{
+		return _baseHeader.Status;
+	}
+
+	bool BaseMessage::Parse()
+	{
+		if (_buffer)
+		{
+			_buffer->ResetRead();
+			if (_baseHeader.ParseFromBuffer(*_buffer.get()) == kMBPHeaderSize)
+			{
+				bool ret = this->ReadExtras();
+
+				ret &= this->ReadKey();
+
+				ret &= this->ReadValue();
+
+				return ret;
+			}
+		}
+		return false;
+	}
+
+	bool BaseMessage::Build()
+	{
+		if (_buffer)
+		{
+			_buffer->Reset();
+			_baseHeader.TotalBodyLen += _baseHeader.ExtrasLen = this->WriteExtras();
+			_baseHeader.TotalBodyLen += _baseHeader.KeyLen = this->WriteKey();
+			_baseHeader.TotalBodyLen += this->WriteValue();
+
+			// reset the buffer so we can write the finalized header
+			_buffer->Reset();
+			if (_baseHeader.WriteToBuffer(*_buffer.get()) == kMBPHeaderSize)
+			{
+				// move the write forward in the buffer by the total body length
+				_buffer->MoveWriteForward(_baseHeader.TotalBodyLen);
+
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void BaseMessage::SetKey(const std::string & key)
+	{
+		_key = key;
+	}
+
+	std::string BaseMessage::GetKey() const
+	{
+		return _key;
+	}
+
+	size_t BaseMessage::WriteExtras()
+	{
+		return 0;
+	}
+
+	bool BaseMessage::ReadExtras()
+	{
+		return true;
+	}
+
+	size_t BaseMessage::WriteKey()
+	{
+		if (_key.empty())
+		{
+			return _baseHeader.KeyLen = 0;
+		}
+		else
+		{
+			_baseHeader.KeyLen = _key.length();
+			if (_buffer->GetBytesLeftForWrite() < _key.length())
+			{
+				_buffer->Realloc(_buffer->GetBufferSize() + _key.length());
+			}
+
+			return _buffer->WriteBytes(_key.c_str(), _key.length());
+		}
+	}
+
+	bool BaseMessage::ReadKey()
+	{
+		_key.clear();
+		if (_baseHeader.KeyLen > 0)
+		{
+			if (_buffer->GetBytesLeftToRead() >= _baseHeader.KeyLen)
+			{
+				_key = std::string((const char *)_buffer->GetReadPtr(), _baseHeader.KeyLen);
+				_buffer->MoveReadForward(_baseHeader.KeyLen);
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	size_t BaseMessage::WriteValue()
+	{
+		return 0;
+	}
+
+	bool BaseMessage::ReadValue()
+	{
+		return true;
+	}
 
 	/**
 	 * GetRequest implementation
@@ -84,13 +205,137 @@ namespace memcache
 	{
 	}
 
-	void GetRequest::SetKey(const std::string & key)
+	bool GetRequest::Parse()
 	{
-		_key = key;
+		if (BaseMessage::Parse())
+		{
+			// per the spec:
+			// MUST NOT have extras
+			// MUST have key
+			// MUST NOT have value
+			if (_baseHeader.Magic != kMagicReq)
+			{
+				return false;
+			}
+
+			if (_baseHeader.Opcode != kOpGet)
+			{
+				return false;
+			}
+
+			if (_baseHeader.ExtrasLen > 0)
+			{
+				return false;
+			}
+
+			if (_baseHeader.KeyLen == 0)
+			{
+				return false;
+			}
+
+			if (_baseHeader.TotalBodyLen != _baseHeader.KeyLen)
+			{
+				return false;
+			}
+			return true;
+		}
+		return false;
 	}
 
-	std::string GetRequest::GetKey() const
+	bool GetRequest::Build()
 	{
-		return _key;
+		_baseHeader = MessageHeader();
+		_baseHeader.Magic = kMagicReq;
+		_baseHeader.Opcode = kOpGet;
+
+		// per the spec:
+		// MUST NOT have extras
+		// MUST have key
+		// MUST NOT have value
+		if (!_key.empty())
+		{
+			_baseHeader.TotalBodyLen = _baseHeader.KeyLen = _key.length();
+		}
+
+		return BaseMessage::Build();
 	}
+
+	/**
+	 * GetResponse implementation
+	 */
+	GetResponse::GetResponse() : _flags(0)
+	{
+	}
+
+	GetResponse::GetResponse(const std::shared_ptr<DataBuffer> & buffer) : BaseMessage(buffer), _flags(0)
+	{
+	}
+
+	bool GetResponse::Parse()
+	{
+		if (BaseMessage::Parse())
+		{
+			// per the spec
+			// MUST have extras
+			// MAY have key
+			// MAY have value
+			return true;
+		}
+		return false;
+	}
+
+	bool GetResponse::Build()
+	{
+		_baseHeader.Magic = kMagicRes;
+		_baseHeader.Opcode = kOpGet;
+
+		return BaseMessage::Build();
+	}
+
+	size_t GetResponse::WriteExtras()
+	{
+		if (_buffer->WriteInt(_flags))
+		{
+			return 4;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	bool GetResponse::ReadExtras()
+	{
+		if (_baseHeader.ExtrasLen == 4)
+		{
+			_flags = _buffer->ReadInt();
+			return true;
+		}
+		return false;
+	}
+
+	size_t GetResponse::WriteValue()
+	{
+		if (_buffer->GetBytesLeftForWrite() < _value.GetBytesWritten())
+		{
+			_buffer->Realloc(_buffer->GetBufferSize() + _value.GetBytesWritten());
+		}
+
+		return _buffer->WriteBytes(_value.GetData(), _value.GetBytesWritten());
+	}
+
+	bool GetResponse::ReadValue()
+	{
+		size_t valSize = _baseHeader.TotalBodyLen - (_baseHeader.KeyLen + _baseHeader.ExtrasLen);
+		if (valSize > 0)
+		{
+			_value.Alloc(valSize);
+
+			_buffer->ReadBytes(_value.GetData(), valSize);
+			_buffer->MoveReadForward(valSize);
+			_value.MoveWriteForward(valSize);
+		}
+		return true;
+	}
+
 }

@@ -262,10 +262,10 @@ namespace memcache
 			switch (header.Opcode)
 			{
 			case kOpGet:
-				_currentMsg.reset(new GetRequest());
+				_currentMsg.reset(new GetRequest(_readBuffer));
 				break;
 			case kOpSet:
-				_currentMsg.reset(new SetRequest());
+				_currentMsg.reset(new SetRequest(_readBuffer));
 				break;
 			default:
 				break;
@@ -276,21 +276,45 @@ namespace memcache
 			switch (header.Opcode)
 			{
 			case kOpGet:
-				_currentMsg.reset(new GetResponse());
+				_currentMsg.reset(new GetResponse(_readBuffer));
 				break;
 			case kOpSet:
-				_currentMsg.reset(new SetResponse());
+				_currentMsg.reset(new SetResponse(_readBuffer));
 				break;
 			default:
 				break;
 			}
 		}
-		std::unique_ptr<BaseMessage> reply;
-		_handler->OnReceivedMessage(_currentMsg.get(), reply);
 
-		if (reply)
+		if (_currentMsg)
 		{
-			// todo: send reply back to the other end
+			if (_currentMsg->Parse())
+			{
+				std::unique_ptr<BaseMessage> reply;
+
+				_handler->OnReceivedMessage(_currentMsg.get(), reply);
+
+				if (reply)
+				{
+					const DataBuffer * toWrite = reply->GetDataBuffer();
+					if (toWrite != nullptr)
+					{
+						int sent = send(_socket, (const char *)toWrite->GetData(), toWrite->GetBytesWritten(), 0);
+						if (sent == SOCKET_ERROR)
+						{
+							std::cout << "Failed to send " << toWrite->GetBytesWritten() << " bytes: " << WSAGetLastError() << std::endl;
+						}
+						else if ((size_t)sent != toWrite->GetBytesWritten())
+						{
+							std::cout << "WARNING: Sent only " << sent << " bytes when we were attempting to send " << toWrite->GetBytesWritten() << " bytes." << std::endl;
+						}
+					}
+				}
+			}
+			else
+			{
+				std::cout << "ERROR: Failed to parse message!" << std::endl;
+			}
 		}
 	}
 }
