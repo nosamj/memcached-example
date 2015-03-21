@@ -3,6 +3,7 @@
 #define MEMACHED_MEMCACHEMESSAGE_H_
 
 #include <memory>
+#include <string>
 #include "MemcacheDefs.h"
 #include "DataBuffer.h"
 
@@ -45,6 +46,11 @@ namespace memcache
 	public:
 		GetRequest();
 		GetRequest(const std::shared_ptr<DataBuffer> & buffer);
+		void SetKey(const std::string & key);
+		std::string GetKey() const;
+
+	protected:
+		std::string _key;
 	};
 
 	class GetResponse : public BaseMessage
@@ -66,13 +72,6 @@ namespace memcache
 	public:
 		SetResponse();
 		SetResponse(const std::shared_ptr<DataBuffer> & buffer);
-	};
-
-	class IMessageHandler
-	{
-	public:
-		virtual void OnHandleRequest(BaseMessage * message, std::unique_ptr<BaseMessage> & response) = 0;
-		virtual void OnHandleResponse(BaseMessage * message) = 0;
 	};
 }
 #endif

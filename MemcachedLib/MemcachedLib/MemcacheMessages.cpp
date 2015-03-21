@@ -69,4 +69,28 @@ namespace memcache
 	{
 		_baseHeader = header;
 	}
+
+
+	/**
+	 * GetRequest implementation
+	 */
+	GetRequest::GetRequest()
+	{
+		_baseHeader.ExtrasLen = 0;
+		_baseHeader.TotalBodyLen = 0;
+	}
+
+	GetRequest::GetRequest(const std::shared_ptr<DataBuffer> & buffer) : BaseMessage(buffer)
+	{
+	}
+
+	void GetRequest::SetKey(const std::string & key)
+	{
+		_key = key;
+	}
+
+	std::string GetRequest::GetKey() const
+	{
+		return _key;
+	}
 }
