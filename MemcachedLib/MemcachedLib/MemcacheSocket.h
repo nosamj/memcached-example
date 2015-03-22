@@ -24,8 +24,10 @@ namespace memcache
 		MemcacheSocket(SOCKET socket, ISocketHandler * handler);
 		~MemcacheSocket();
 		bool Listen(unsigned short port, ISocketHandler * handler);
-		bool Connect(const std::string & address, unsigned short port);
+		bool Connect(const std::string & address, unsigned short port, bool useAsyncRead);
 		void Close();
+		bool IsConnected() const { return _socket != INVALID_SOCKET; }
+		bool SendBuiltMessage(const BaseMessage * message);
 
 		/**
 		 * IRunnable methods
@@ -33,6 +35,8 @@ namespace memcache
 		virtual void Run(const Thread * thread);
 
 		unsigned int GetSessionID() const { return _sessionID; }
+
+		void ReadMessage();
 
 	protected:
 		SOCKET _socket;
@@ -42,8 +46,5 @@ namespace memcache
 		ISocketHandler * _handler;
 		std::shared_ptr<DataBuffer>	_readBuffer;
 		std::unique_ptr<BaseMessage> _currentMsg;
-
-	protected:
-		void ReadData();
 	};
 }

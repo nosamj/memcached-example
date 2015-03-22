@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemcacheUnitTests", "Memcac
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemcacheServer", "MemcacheServer\MemcacheServer.vcxproj", "{FDC296BE-9B33-4347-9B1D-C43C9A9CB376}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemcacheClient", "MemcacheClient\MemcacheClient.vcxproj", "{14CC46D7-737E-49F3-A399-43A0C7FAC93D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -27,6 +29,10 @@ Global
 		{FDC296BE-9B33-4347-9B1D-C43C9A9CB376}.Debug|Win32.Build.0 = Debug|Win32
 		{FDC296BE-9B33-4347-9B1D-C43C9A9CB376}.Release|Win32.ActiveCfg = Release|Win32
 		{FDC296BE-9B33-4347-9B1D-C43C9A9CB376}.Release|Win32.Build.0 = Release|Win32
+		{14CC46D7-737E-49F3-A399-43A0C7FAC93D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{14CC46D7-737E-49F3-A399-43A0C7FAC93D}.Debug|Win32.Build.0 = Debug|Win32
+		{14CC46D7-737E-49F3-A399-43A0C7FAC93D}.Release|Win32.ActiveCfg = Release|Win32
+		{14CC46D7-737E-49F3-A399-43A0C7FAC93D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

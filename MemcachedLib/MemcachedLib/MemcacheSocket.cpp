@@ -95,7 +95,7 @@ namespace memcache
 		return true;
 	}
 
-	bool MemcacheSocket::Connect(const std::string & address, unsigned short port)
+	bool MemcacheSocket::Connect(const std::string & address, unsigned short port, bool useAsyncRead)
 	{
 		this->Close();
 
@@ -118,12 +118,14 @@ namespace memcache
 			return false;
 		}
 
-		//
-		// now that we have connected, start the select thread so that we can listen
-		// for incoming messages.
-		//
-		_selectThread.Start(this);
-
+		if (useAsyncRead)
+		{
+			//
+			// now that we have connected, start the select thread so that we can listen
+			// for incoming messages.
+			//
+			_selectThread.Start(this);
+		}
 		return true;
 	}
 
@@ -145,6 +147,21 @@ namespace memcache
 
 		_selectThread.Stop(true);
 		_isListening = false;
+	}
+
+	bool MemcacheSocket::SendBuiltMessage(const BaseMessage * message)
+	{
+		const DataBuffer * buffer = message->GetDataBuffer();
+		if (nullptr != buffer)
+		{
+			size_t toSend = buffer->GetBytesWritten();
+			int sent = send(_socket, (const char *)buffer->GetData(), toSend, 0);
+			if (sent != SOCKET_ERROR)
+			{
+				return ((size_t)sent == toSend);
+			}
+		}
+		return false;
 	}
 
 	void MemcacheSocket::Run(const Thread * thread)
@@ -183,7 +200,7 @@ namespace memcache
 					}
 					else
 					{
-						std::cout << "Failed to accept incoming connection!" << std::endl;
+						std::cout << "Failed to accept incoming connection! " << WSAGetLastError() << std::endl;
 					}
 				}
 				else
@@ -193,7 +210,7 @@ namespace memcache
 					if (canRead >= kMBPHeaderSize)
 					{
 						// there's data to be read!
-						this->ReadData();
+						this->ReadMessage();
 					}
 					else if (canRead == SOCKET_ERROR)
 					{
@@ -220,7 +237,7 @@ namespace memcache
 		}
 	}
 
-	void MemcacheSocket::ReadData()
+	void MemcacheSocket::ReadMessage()
 	{
 		int read;
 		//

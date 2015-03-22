@@ -48,6 +48,9 @@
     <ClInclude Include="Threading.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MemcacheClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReadWriteLock.cpp">
@@ -72,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MemcacheSocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MemcacheClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

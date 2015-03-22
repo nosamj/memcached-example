@@ -10,6 +10,7 @@ using namespace memcache;
 int _tmain(int argc, _TCHAR* argv[])
 {
 	std::unique_ptr<MemcacheServer> server(new MemcacheServer());
+	unsigned short listenPort = 30000;
 	WSADATA wsaData;
 	//
 	// perform WSA initialization
@@ -21,7 +22,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		return -1;
 	}
 
-	if (!server->Start())
+	if (!server->Start(listenPort))
 	{
 		std::cout << "Failed to start server!" << std::endl;
 		return -1;

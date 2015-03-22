@@ -18,7 +18,18 @@ namespace memcache
 		MemcacheServer();
 		~MemcacheServer();
 
-		bool Start(unsigned short listenPort = 30000);
+		/**
+		 * Start the server.
+		 *
+		 * @param listenPort    TCP port to listen on for incoming connections or 0 to not listen(used for unit tests).
+		 *
+		 * @return   true - server successfully started, false - could not listen on the provided port.
+		 */
+		bool Start(unsigned short listenPort);
+
+		/**
+		 * Closes all connections and clears the data cache.
+		 */
 		void Shutdown();
 
 		//
