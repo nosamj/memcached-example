@@ -46,5 +46,8 @@ namespace memcache
 		ISocketHandler * _handler;
 		std::shared_ptr<DataBuffer>	_readBuffer;
 		std::unique_ptr<BaseMessage> _currentMsg;
+
+	protected:
+		void SetSockOpts();
 	};
 }

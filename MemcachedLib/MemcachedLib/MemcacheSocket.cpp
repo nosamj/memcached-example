@@ -126,6 +126,10 @@ namespace memcache
 			//
 			_selectThread.Start(this);
 		}
+		else
+		{
+			this->SetSockOpts();
+		}
 		return true;
 	}
 
@@ -166,7 +170,10 @@ namespace memcache
 
 	void MemcacheSocket::Run(const Thread * thread)
 	{
-		while (!thread->ShouldTerminate())
+		std::cout << "[" << _sessionID << "] SelectThread entered" << std::endl;
+		this->SetSockOpts();
+
+		while (!thread->ShouldTerminate() && this->IsConnected())
 		{
 			fd_set readFD;
 			timeval val;
@@ -191,9 +198,7 @@ namespace memcache
 				if (_isListening)
 				{
 					// todo: call accept
-					sockaddr_in addr;
-					int addrLen;
-					SOCKET socket = accept(_socket, (sockaddr*)&addr, &addrLen);
+					SOCKET socket = accept(_socket, NULL, NULL);
 					if (INVALID_SOCKET != socket)
 					{
 						_handler->OnAcceptConn(new MemcacheSocket(socket, _handler));
@@ -209,10 +214,11 @@ namespace memcache
 					int canRead = recv(_socket, peekHeader, kMBPHeaderSize, MSG_PEEK);
 					if (canRead >= kMBPHeaderSize)
 					{
+						std::cout << "MemcacheSocket::Run() There's " << canRead << " bytes of data to be read!" << std::endl;
 						// there's data to be read!
 						this->ReadMessage();
 					}
-					else if (canRead == SOCKET_ERROR)
+					else
 					{
 						// if the select thread signals that we can read but there isn't any data to be read it's
 						// probably becaue the socket has closed gracefully.
@@ -225,16 +231,19 @@ namespace memcache
 						{
 							std::cout << "[" << _sessionID << "] Socket has closed with error: " << error << std::endl;
 						}
+						_handler->OnSocketClosed(_sessionID);
+						break;
 					}
 				}
 			}
-			else
+			else if (res == SOCKET_ERROR)
 			{
 				// there was an internal socket error in select so he socket
 				// has probably been closed abnormally
 				break;
 			}
 		}
+		std::cout << "[" << _sessionID << "] SelectThread returning" << std::endl;
 	}
 
 	void MemcacheSocket::ReadMessage()
@@ -252,7 +261,7 @@ namespace memcache
 		//
 		while (_readBuffer->GetBytesWritten() < kMBPHeaderSize)
 		{
-			read = recv(_socket, (char *)_readBuffer->GetData(), (kMBPHeaderSize - _readBuffer->GetBytesWritten()), 0);
+			read = recv(_socket, (char *)_readBuffer->GetWritePtr(), (kMBPHeaderSize - _readBuffer->GetBytesWritten()), 0);
 			if (read != SOCKET_ERROR)
 			{
 				_readBuffer->MoveWriteForward(read);
@@ -260,7 +269,7 @@ namespace memcache
 			else
 			{
 				std::cout << "[" << _sessionID << "]" << "SOCKET_ERROR: " << WSAGetLastError() << std::endl;
-				break;
+				return;
 			}
 		}
 
@@ -365,6 +374,16 @@ namespace memcache
 		else
 		{
 			std::cout << "[" << _sessionID << "] unsupported message type!" << std::endl;
+		}
+	}
+
+	void MemcacheSocket::SetSockOpts()
+	{
+		if (INVALID_SOCKET != _socket)
+		{
+			DWORD timeout = 1000;
+			int len = sizeof(timeout);
+			setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, len);
 		}
 	}
 }

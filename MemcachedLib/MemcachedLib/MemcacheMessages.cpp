@@ -114,6 +114,7 @@ namespace memcache
 		if (_buffer)
 		{
 			_buffer->Reset();
+			_buffer->MoveWriteForward(kMBPHeaderSize);
 			_baseHeader.TotalBodyLen += _baseHeader.ExtrasLen = this->WriteExtras();
 			_baseHeader.TotalBodyLen += _baseHeader.KeyLen = this->WriteKey();
 			_baseHeader.TotalBodyLen += this->WriteValue();
@@ -257,10 +258,6 @@ namespace memcache
 		// MUST NOT have extras
 		// MUST have key
 		// MUST NOT have value
-		if (!_key.empty())
-		{
-			_baseHeader.TotalBodyLen = _baseHeader.KeyLen = _key.length();
-		}
 
 		return BaseMessage::Build();
 	}

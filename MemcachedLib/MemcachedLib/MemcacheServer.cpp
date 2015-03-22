@@ -81,9 +81,10 @@ namespace memcache
 
 	void MemcacheServer::OnAcceptConn(MemcacheSocket * socket)
 	{
+		std::cout << "Accepting new socket connection!" << std::endl;
 		LockHelper myLock(_sockMapMutex);
-
 		_socketMap[socket->GetSessionID()].reset(socket);
+		std::cout << "New socket connection accepted!" << std::endl;
 	}
 
 	void MemcacheServer::OnReceivedMessage(BaseMessage * message, std::unique_ptr<BaseMessage> & reply)
