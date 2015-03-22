@@ -14,7 +14,7 @@ namespace memcache
 		{
 		public:
 			virtual void OnAcceptConn(MemcacheSocket * socket) = 0;
-			virtual void OnReceivedMessage(BaseMessage * message, std::unique_ptr<BaseMessage> & response) = 0;
+			virtual void OnReceivedMessage(BaseMessage * message, std::unique_ptr<BaseMessage> & reply) = 0;
 			virtual void OnSocketClosed(unsigned int sessionID) = 0;
 		};
 

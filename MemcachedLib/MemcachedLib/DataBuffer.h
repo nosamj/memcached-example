@@ -8,6 +8,7 @@ namespace memcache
 	{
 	public:
 		DataBuffer();
+		DataBuffer(const DataBuffer & rhs);
 		DataBuffer(size_t len);
 		~DataBuffer();
 

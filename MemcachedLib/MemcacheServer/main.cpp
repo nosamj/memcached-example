@@ -10,10 +10,16 @@ using namespace memcache;
 int _tmain(int argc, _TCHAR* argv[])
 {
 	std::unique_ptr<MemcacheServer> server(new MemcacheServer());
-
+	WSADATA wsaData;
 	//
 	// perform WSA initialization
 	//
+	int res = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (res != NO_ERROR) 
+	{
+		std::cout << "WSAStartup failed with error: " << res << std::endl;
+		return -1;
+	}
 
 	if (!server->Start())
 	{
@@ -31,6 +37,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	server.reset();
+
+	WSACleanup();
 
 	return 0;
 }

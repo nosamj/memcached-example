@@ -96,4 +96,14 @@ namespace memcache
 
 		_writeMutex.Unlock();
 	}
+
+	IMutex * ReadWriteLock::ReadMutex()
+	{
+		return _readLock;
+	}
+
+	IMutex * ReadWriteLock::WriteMutex()
+	{
+		return _writeLock;
+	}
 }

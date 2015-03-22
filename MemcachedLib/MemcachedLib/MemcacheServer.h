@@ -18,7 +18,7 @@ namespace memcache
 		MemcacheServer();
 		~MemcacheServer();
 
-		bool Start();
+		bool Start(unsigned short listenPort = 30000);
 		void Shutdown();
 
 		//
@@ -30,16 +30,16 @@ namespace memcache
 		// ISocketHandler methods
 		//
 		virtual void OnAcceptConn(MemcacheSocket * socket);
-		virtual void OnReceivedMessage(BaseMessage * message, std::unique_ptr<BaseMessage> & response);
+		virtual void OnReceivedMessage(BaseMessage * message, std::unique_ptr<BaseMessage> & reply);
 		virtual void OnSocketClosed(unsigned int sessionID);
 
 	protected:
-		typedef std::map<unsigned int, std::unique_ptr<MemcacheSocket> > SocketMap_t;
-		typedef std::list<std::unique_ptr<MemcacheSocket> > SocketList_t;
+		typedef std::map<unsigned int, std::shared_ptr<MemcacheSocket> > SocketMap_t;
+		typedef std::list<std::shared_ptr<MemcacheSocket> > SocketList_t;
 		typedef struct DataEntry
 		{
 			unsigned int Flags;
-			std::unique_ptr<DataBuffer> DataBuffer;
+			std::shared_ptr<DataBuffer> DataBuffer;
 		}DataEntry_t;
 		typedef std::map<std::string, DataEntry_t> DataMap_t;
 

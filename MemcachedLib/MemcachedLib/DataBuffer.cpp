@@ -11,6 +11,24 @@ namespace memcache
 	{
 	}
 
+	DataBuffer::DataBuffer(const DataBuffer & rhs)
+		: _data(nullptr),
+		_bufferSize(0),
+		_writeOffset(0),
+		_readOffset(0)
+	{
+		size_t len = rhs.GetBufferSize();
+		if (len > 0)
+		{
+			this->Alloc(len);
+
+			memcpy(this->GetData(), rhs.GetData(), len);
+
+			_writeOffset = rhs._writeOffset;
+			_readOffset = rhs._readOffset;
+		}
+	}
+
 	DataBuffer::DataBuffer(size_t len)
 		: _data(nullptr),
 		_bufferSize(0),
@@ -326,12 +344,16 @@ namespace memcache
 	{
 		if (this != &rhs)
 		{
-			this->Alloc(rhs.GetBufferSize());
+			size_t len = rhs.GetBufferSize();
+			if (len > 0)
+			{
+				this->Alloc(len);
 
-			memcpy(this->GetData(), rhs.GetData(), rhs.GetBufferSize());
+				memcpy(this->GetData(), rhs.GetData(), len);
 
-			_writeOffset = rhs._writeOffset;
-			_readOffset = rhs._readOffset;
+				_writeOffset = rhs._writeOffset;
+				_readOffset = rhs._readOffset;
+			}
 		}
 
 		return *this;

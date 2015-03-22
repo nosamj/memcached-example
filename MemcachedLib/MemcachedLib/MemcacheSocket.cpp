@@ -28,6 +28,21 @@ namespace memcache
 		_readBuffer(new DataBuffer(kMBPHeaderSize))
 	{
 	}
+
+	MemcacheSocket::MemcacheSocket(SOCKET socket, MemcacheSocket::ISocketHandler * handler) :
+		_socket(socket),
+		_sessionID(GetNextSessionID()),
+		_handler(handler),
+		_isListening(false),
+		_readBuffer(new DataBuffer(kMBPHeaderSize))
+	{
+		_selectThread.Start(this);
+	}
+
+	MemcacheSocket::~MemcacheSocket()
+	{
+		this->Close();
+	}
 	
 	bool MemcacheSocket::Listen(unsigned short port, MemcacheSocket::ISocketHandler * handler)
 	{
@@ -308,7 +323,7 @@ namespace memcache
 
 				_handler->OnReceivedMessage(_currentMsg.get(), reply);
 
-				if (reply)
+				if (reply && reply->Build())
 				{
 					const DataBuffer * toWrite = reply->GetDataBuffer();
 					if (toWrite != nullptr)

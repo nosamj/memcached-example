@@ -13,26 +13,30 @@ namespace memcache
 		this->Shutdown();
 	}
 
-	bool MemcacheServer::Start()
+	bool MemcacheServer::Start(unsigned short listenPort)
 	{
 		//
 		// start management thread
 		//
 		_thread.Start(this);
 
-		//
-		// start the listen socket so we can accept connections
-		//
-		if (_listenSock.Listen(30000, this))
+		if (listenPort > 0)
 		{
-			std::cout << "Server started!" << std::endl;
-			return true;
+			//
+			// start the listen socket so we can accept connections
+			//
+			if (_listenSock.Listen(listenPort, this))
+			{
+				std::cout << "Server started!" << std::endl;
+				return true;
+			}
+			else
+			{
+				this->Shutdown();
+				return false;
+			}
 		}
-		else
-		{
-			this->Shutdown();
-			return false;
-		}
+		return true;
 	}
 
 	void MemcacheServer::Shutdown()
@@ -84,7 +88,68 @@ namespace memcache
 
 	void MemcacheServer::OnReceivedMessage(BaseMessage * message, std::unique_ptr<BaseMessage> & reply)
 	{
+		MessageHeader header = message->GetHeader();
+		if (header.Magic == kMagicReq)
+		{
+			switch (header.Opcode)
+			{
+			case kOpGet:
+			{
+				LockHelper myLock(_dataMapLock.ReadMutex());
+				GetRequest * theReq = static_cast<GetRequest*>(message);
+				GetResponse * theRes = new GetResponse();
+				reply.reset(theRes);
+				reply->SetKey(theReq->GetKey());
+				DataMap_t::iterator it = _dataMap.find(theReq->GetKey());
+				if (it != _dataMap.end())
+				{
+					if (it->second.DataBuffer)
+					{
+						theRes->SetFlags(it->second.Flags);
+						theRes->SetValue(*it->second.DataBuffer.get());
+						reply->SetStatus(kResNoError);
+					}
+					else
+					{
+						reply->SetStatus(kResNotStored);
+					}
+				}
+				else
+				{
+					// entry was not found so return a response with a Not Found status
+					reply->SetStatus(kResKeyNotFound);
+				}
+			}
+				break;
+			case kOpSet:
+			{
+				SetRequest * theReq = static_cast<SetRequest *>(message);
+				SetResponse * theRes = new SetResponse();
+				//
+				// create a new map entry and set the flags
+				// and value from the incoming request message
+				//
+				DataMap_t::mapped_type entry;
+				entry.Flags = theReq->GetFlags();
+				entry.DataBuffer.reset(new DataBuffer());
+				*entry.DataBuffer.get() = theReq->GetValue();
 
+				//
+				// now that the data has been set let's insert this entry into our map
+				//
+				_dataMapLock.LockWrite();
+				_dataMap[theReq->GetKey()] = entry;
+				_dataMapLock.UnlockWrite();
+
+				// build our reply
+				reply.reset(theRes);
+				reply->SetStatus(kResNoError);
+			}
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	void MemcacheServer::OnSocketClosed(unsigned int sessionID)
