@@ -34,6 +34,7 @@ namespace memcache
 		virtual ~BaseMessage();
 
 		const MessageHeader & GetHeader() const;
+		MessageHeader & GetHeader();
 		void SetHeader(const MessageHeader & header);
 		void SetStatus(unsigned short status);
 		unsigned short GetStatus() const;
@@ -96,6 +97,25 @@ namespace memcache
 	public:
 		SetRequest();
 		SetRequest(const std::shared_ptr<DataBuffer> & buffer);
+		virtual bool Parse();
+		virtual bool Build();
+		void SetValue(const DataBuffer & value) { _value = value; }
+		DataBuffer & GetValue() { return _value; }
+		void SetFlags(unsigned int flags) { _flags = flags; }
+		unsigned int GetFlags() const { return _flags; }
+		void SetExpiration(unsigned int exp) { _expires = exp; }
+		unsigned int GetExpiration() const { return _expires; }
+
+	protected:
+		DataBuffer _value;
+		unsigned int _flags;
+		unsigned int _expires;
+
+	protected:
+		virtual size_t WriteExtras();
+		virtual bool ReadExtras();
+		virtual size_t WriteValue();
+		virtual bool ReadValue();
 	};
 
 	class SetResponse : public BaseMessage
@@ -103,6 +123,7 @@ namespace memcache
 	public:
 		SetResponse();
 		SetResponse(const std::shared_ptr<DataBuffer> & buffer);
+		virtual bool Build();
 	};
 }
 #endif

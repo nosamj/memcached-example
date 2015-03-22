@@ -30,4 +30,9 @@ namespace memcache
 	{
 		WaitForSingleObject(_handle, INFINITE);
 	}
+	
+	void Event::TimedWait(unsigned int waitMS)
+	{
+		WaitForSingleObject(_handle, waitMS);
+	}
 }

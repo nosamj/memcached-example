@@ -247,3 +247,109 @@ TEST_CASE("GetResponse build")
 	REQUIRE(header.KeyLen == key.length());
 	REQUIRE(header.TotalBodyLen == (valBuffer.GetBytesWritten() + header.KeyLen + header.ExtrasLen));
 }
+
+TEST_CASE("SetRequest successful parse")
+{
+
+	std::shared_ptr<DataBuffer> buffer(new DataBuffer());
+	std::unique_ptr<SetRequest> res;
+	unsigned char byteArray[] = {
+		kMagicReq, // magic
+		kOpSet, // opcode
+		0, 8, // key length
+		8, // extras length
+		0, // data type
+		0, 0, // reserved
+		0, 0, 0, 20, // total body length
+		0, 0, 0, 0, // opaque
+		0, 0, 0, 0, 0, 0, 0, 0, // CAS
+		0xDE, 0xAD, 0xBE, 0xEF, // flags
+		0xCA, 0xFE, 0xBA, 0xBE, // expirarion
+		'm', 'e', 'm', 'c', 'a', 'c', 'h', 'e', // key data
+		'e', 'x', 'a', 'm' // value data
+	};
+	buffer->Alloc(sizeof(byteArray));
+	buffer->WriteBytes(byteArray, sizeof(byteArray));
+	res.reset(new SetRequest(buffer));
+	REQUIRE(res->Parse());
+	REQUIRE(res->GetFlags() == 0xDEADBEEF);
+	REQUIRE(res->GetExpiration() == 0xCAFEBABE);
+	DataBuffer & value = res->GetValue();
+	unsigned char valArray[] = { 'e', 'x', 'a', 'm' };
+	REQUIRE(value.GetBytesWritten() == 4);
+	REQUIRE(memcmp(value.GetData(), valArray, 4) == 0);
+}
+
+TEST_CASE("SetRequest build")
+{
+	SetRequest req;
+	std::string key = "memcache";
+	unsigned int flags = 0xDEADBEEF;
+	unsigned int exp = 0xCAFEBABE;
+	DataBuffer valBuffer;
+	unsigned char valArray[] = { 'e', 'x', 'a', 'm' };
+	valBuffer.Alloc(sizeof(valArray) * 512);
+	for (int i = 0; i < 512; ++i)
+	{
+		valBuffer.WriteBytes(valArray, sizeof(valArray));
+	}
+
+	req.SetKey(key);
+	req.SetFlags(flags);
+	req.SetExpiration(exp);
+	req.SetValue(valBuffer);
+
+	REQUIRE(req.Build());
+	MessageHeader header = req.GetHeader();
+	REQUIRE(header.Magic == kMagicReq);
+	REQUIRE(header.Opcode == kOpSet);
+	REQUIRE(header.ExtrasLen == 8);
+	REQUIRE(header.KeyLen == key.length());
+	REQUIRE(header.TotalBodyLen == (valBuffer.GetBytesWritten() + header.KeyLen + header.ExtrasLen));
+}
+
+TEST_CASE("SetResponse successful parse")
+{
+	std::shared_ptr<DataBuffer> buffer(new DataBuffer());
+	std::unique_ptr<SetResponse> res;
+	unsigned char byteArray[] = {
+		kMagicRes, // magic
+		kOpSet, // opcode
+		0, 0, // key length
+		0, // extras length
+		0, // data type
+		0, kResOutOfMem, // status (Not found)
+		0, 0, 0, 0, // total body length
+		0, 0, 0, 0, // opaque
+		0, 0, 0, 0, 0, 0, 0, 1 // CAS
+	};
+
+	buffer->Alloc(sizeof(byteArray));
+	buffer->WriteBytes(byteArray, sizeof(byteArray));
+
+	res.reset(new SetResponse(buffer));
+	REQUIRE(res->Parse());
+	MessageHeader header = res->GetHeader();
+	REQUIRE(header.Magic == kMagicRes);
+	REQUIRE(header.Opcode == kOpSet);
+	REQUIRE(header.Status == kResOutOfMem);
+	REQUIRE(header.CAS == 1L);
+	REQUIRE(header.KeyLen == 0);
+	REQUIRE(header.ExtrasLen == 0);
+	REQUIRE(header.TotalBodyLen == 0);
+}
+
+TEST_CASE("SetResponse build")
+{
+	SetResponse res;
+
+	res.GetHeader().Status = kResOutOfMem;
+	REQUIRE(res.Build());
+	MessageHeader header = res.GetHeader();
+	REQUIRE(header.Magic == kMagicRes);
+	REQUIRE(header.Opcode == kOpSet);
+	REQUIRE(header.ExtrasLen == 0);
+	REQUIRE(header.KeyLen == 0);
+	REQUIRE(header.TotalBodyLen == 0);
+	REQUIRE(header.Status == kResOutOfMem);
+}

@@ -3,6 +3,7 @@
 #define MEMCACHE_MEMCACHESERVER_H_
 
 #include <string>
+#include <list>
 #include <map>
 #include "ReadWriteLock.h"
 #include "DataBuffer.h"
@@ -34,11 +35,28 @@ namespace memcache
 
 	protected:
 		typedef std::map<unsigned int, std::unique_ptr<MemcacheSocket> > SocketMap_t;
-		typedef std::map<std::string, std::unique_ptr<DataBuffer> > DataMap_t;
-		DataMap_t _dataMap;
-		ReadWriteLock _mapLock;///< used to protect the cache
-		MemcacheSocket _listenSock;
-		Thread _thread;
+		typedef std::list<std::unique_ptr<MemcacheSocket> > SocketList_t;
+		typedef struct DataEntry
+		{
+			unsigned int Flags;
+			std::unique_ptr<DataBuffer> DataBuffer;
+		}DataEntry_t;
+		typedef std::map<std::string, DataEntry_t> DataMap_t;
+
+		DataMap_t _dataMap;///< map that stores all of the data entries.
+		ReadWriteLock _dataMapLock;///< used to protect the cache
+		SocketMap_t _socketMap;///< map for storing all of the client sockets
+		Mutex _sockMapMutex;///< controls access to the socket map
+		SocketList_t _socketDisposal;///< holds disconnected sockets until they can be destroyed.
+		Mutex _sockListMutex;///< controls access to the dead sockets list
+		MemcacheSocket _listenSock;///< socket that will be used to listen for incoming connections
+		Thread _thread;///< thread that will be used to remove disconnected sockets
+		Event _threadEvent;///< event that will be used to signal the management thread of the server to remove closed sockets
+
+	protected:
+		void ProcessClosedSockets();
+		void CloseAllSockets();
+		void ClearDataCache();
 	};
 }
 #endif

@@ -14,6 +14,7 @@ namespace memcache
 		void Set();
 		void Reset();
 		void Wait();
+		void TimedWait(unsigned int waitMS);
 	protected:
 		HANDLE _handle;
 	};

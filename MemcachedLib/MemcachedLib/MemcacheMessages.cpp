@@ -70,6 +70,11 @@ namespace memcache
 		return _baseHeader;
 	}
 
+	MessageHeader & BaseMessage::GetHeader()
+	{
+		return _baseHeader;
+	}
+
 	void BaseMessage::SetHeader(const MessageHeader & header)
 	{
 		_baseHeader = header;
@@ -338,4 +343,123 @@ namespace memcache
 		return true;
 	}
 
+	/**
+	 * SetRequest implementation
+	 */
+	SetRequest::SetRequest() : BaseMessage(), _flags(0)
+	{
+	}
+
+	SetRequest::SetRequest(const std::shared_ptr<DataBuffer> & buffer) : BaseMessage(buffer), _flags(0)
+	{
+	}
+
+	bool SetRequest::Parse()
+	{
+		if (BaseMessage::Parse())
+		{
+			// per the spec
+			// MUST have extras
+			// MUST have key
+			// MUST have value
+			// Extras: 4 bytes flags, 4 bytes expiration
+			if (_baseHeader.ExtrasLen != 8)
+			{
+				return false;
+			}
+
+			if (_baseHeader.KeyLen == 0)
+			{
+				return false;
+			}
+
+			if (_baseHeader.TotalBodyLen <= (unsigned int)(_baseHeader.ExtrasLen + _baseHeader.KeyLen))
+			{
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	bool SetRequest::Build()
+	{
+		_baseHeader.Magic = kMagicReq;
+		_baseHeader.Opcode = kOpSet;
+
+		return BaseMessage::Build();
+	}
+
+	size_t SetRequest::WriteExtras()
+	{
+		if (_buffer->WriteInt(_flags))
+		{
+			if (_buffer->WriteInt(_expires))
+			{
+				return 8;
+			}
+			else // this would actually be an error because it would produce an invalid set request message
+			{
+				return 4;
+			}
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	bool SetRequest::ReadExtras()
+	{
+		if (_baseHeader.ExtrasLen == 8)
+		{
+			_flags = _buffer->ReadInt();
+			_expires = _buffer->ReadInt();
+			return true;
+		}
+		return false;
+	}
+
+	size_t SetRequest::WriteValue()
+	{
+		if (_buffer->GetBytesLeftForWrite() < _value.GetBytesWritten())
+		{
+			_buffer->Realloc(_buffer->GetBufferSize() + _value.GetBytesWritten());
+		}
+
+		return _buffer->WriteBytes(_value.GetData(), _value.GetBytesWritten());
+	}
+
+	bool SetRequest::ReadValue()
+	{
+		size_t valSize = _baseHeader.TotalBodyLen - (_baseHeader.KeyLen + _baseHeader.ExtrasLen);
+		if (valSize > 0)
+		{
+			_value.Alloc(valSize);
+
+			_buffer->ReadBytes(_value.GetData(), valSize);
+			_buffer->MoveReadForward(valSize);
+			_value.MoveWriteForward(valSize);
+		}
+		return true;
+	}
+
+	/**
+	 * SetResposne implementation
+	 */
+	SetResponse::SetResponse() : BaseMessage()
+	{
+	}
+
+	SetResponse::SetResponse(const std::shared_ptr<DataBuffer> & buffer) : BaseMessage(buffer)
+	{
+	}
+
+	bool SetResponse::Build()
+	{
+		_baseHeader.Magic = kMagicRes;
+		_baseHeader.Opcode = kOpSet;
+
+		return BaseMessage::Build();
+	}
 }

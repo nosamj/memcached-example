@@ -129,11 +129,6 @@ namespace memcache
 		}
 
 		_selectThread.Stop(true);
-
-		if (nullptr != _handler)
-		{
-			_handler->OnSocketClosed(_sessionID);
-		}
 		_isListening = false;
 	}
 
@@ -178,8 +173,27 @@ namespace memcache
 				}
 				else
 				{
-					// there's data to be read!
-					this->ReadData();
+					char peekHeader[kMBPHeaderSize];
+					int canRead = recv(_socket, peekHeader, kMBPHeaderSize, MSG_PEEK);
+					if (canRead >= kMBPHeaderSize)
+					{
+						// there's data to be read!
+						this->ReadData();
+					}
+					else if (canRead == SOCKET_ERROR)
+					{
+						// if the select thread signals that we can read but there isn't any data to be read it's
+						// probably becaue the socket has closed gracefully.
+						int error = WSAGetLastError();
+						if (error == 0)
+						{
+							std::cout << "[" << _sessionID << "] Socket has been closed gracefully." << std::endl;
+						}
+						else
+						{
+							std::cout << "[" << _sessionID << "] Socket has closed with error: " << error << std::endl;
+						}
+					}
 				}
 			}
 			else
@@ -213,7 +227,7 @@ namespace memcache
 			}
 			else
 			{
-				std::cout << "SOCKET_ERROR: " << WSAGetLastError() << std::endl;
+				std::cout << "[" << _sessionID << "]" << "SOCKET_ERROR: " << WSAGetLastError() << std::endl;
 				break;
 			}
 		}
@@ -302,19 +316,23 @@ namespace memcache
 						int sent = send(_socket, (const char *)toWrite->GetData(), toWrite->GetBytesWritten(), 0);
 						if (sent == SOCKET_ERROR)
 						{
-							std::cout << "Failed to send " << toWrite->GetBytesWritten() << " bytes: " << WSAGetLastError() << std::endl;
+							std::cout << "[" << _sessionID << "] Failed to send " << toWrite->GetBytesWritten() << " bytes: " << WSAGetLastError() << std::endl;
 						}
 						else if ((size_t)sent != toWrite->GetBytesWritten())
 						{
-							std::cout << "WARNING: Sent only " << sent << " bytes when we were attempting to send " << toWrite->GetBytesWritten() << " bytes." << std::endl;
+							std::cout << "[" << _sessionID << "] WARNING: Sent only " << sent << " bytes when we were attempting to send " << toWrite->GetBytesWritten() << " bytes." << std::endl;
 						}
 					}
 				}
 			}
 			else
 			{
-				std::cout << "ERROR: Failed to parse message!" << std::endl;
+				std::cout << "[" << _sessionID << "] ERROR: Failed to parse message!" << std::endl;
 			}
+		}
+		else
+		{
+			std::cout << "[" << _sessionID << "] unsupported message type!" << std::endl;
 		}
 	}
 }
