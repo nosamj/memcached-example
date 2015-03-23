@@ -30,5 +30,11 @@ namespace memcache
 	static const unsigned short kResNonNum = 0x0006;
 	static const unsigned short kResUnknownComm = 0x0081;
 	static const unsigned short kResOutOfMem = 0x0082;
+
+	/**
+	 * Converts the above status codes into their corresponding string
+	 * representation
+	 */
+	const char * StatusToString(unsigned short statusCode);
 }
 #endif

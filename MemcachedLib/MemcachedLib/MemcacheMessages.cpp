@@ -3,6 +3,32 @@
 
 namespace memcache
 {
+	const char * StatusToString(unsigned short statusCode)
+	{
+		switch (statusCode)
+		{
+		case kResInvalidArgs:
+			return "Invalid Arguments";
+		case kResKeyExists:
+			return "Key exists";
+		case kResKeyNotFound:
+			return "Key not found";
+		case kResNoError:
+			return "No error";
+		case kResNonNum:
+			return "Incr/Decr on non-numeric value";
+		case kResNotStored:
+			return "Item not stored";
+		case kResOutOfMem:
+			return "Out of memory";
+		case kResTooLarge:
+			return "Value too large";
+		case kResUnknownComm:
+			return "Unknown command";
+		default:
+			return "";
+		}
+	}
 
 	/**
 	 * MessageHeader implementation

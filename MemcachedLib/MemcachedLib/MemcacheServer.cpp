@@ -81,10 +81,8 @@ namespace memcache
 
 	void MemcacheServer::OnAcceptConn(MemcacheSocket * socket)
 	{
-		std::cout << "Accepting new socket connection!" << std::endl;
 		LockHelper myLock(_sockMapMutex);
 		_socketMap[socket->GetSessionID()].reset(socket);
-		std::cout << "New socket connection accepted!" << std::endl;
 	}
 
 	void MemcacheServer::OnReceivedMessage(BaseMessage * message, std::unique_ptr<BaseMessage> & reply)
@@ -207,5 +205,24 @@ namespace memcache
 		LockHelper myLock(_dataMapLock.WriteMutex());
 
 		_dataMap.clear();
+	}
+
+	void MemcacheServer::PrintDataCache()
+	{
+		LockHelper myLock(_dataMapLock.ReadMutex());
+
+		std::cout << "DataCache (" << _dataMap.size() << " entries)" << std::endl;
+		DataMap_t::iterator it, endIt = _dataMap.end();
+		for (it = _dataMap.begin();
+			it != endIt;
+			++it)
+		{
+			std::cout << "Key:" << it->first << " Flags:" << it->second.Flags;
+			if (it->second.DataBuffer)
+			{
+				std::cout << " DataSize:" << it->second.DataBuffer->GetBytesWritten();
+			}
+			std::cout << std::endl;
+		}
 	}
 }

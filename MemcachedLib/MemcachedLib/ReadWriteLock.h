@@ -13,12 +13,21 @@ namespace memcache
 	 * Class that allows for multiple read threads to access some
 	 * resource simultaneously while only one writer can write to
 	 * said resource at a time. Essentially, readers don't block
-	 * other readers but a writer blocks all readers.
+	 * other readers but a writer blocks all readers. Likewise,
+	 * readers block the single writer until they are all finished
+	 * reading.
 	 */
 	class ReadWriteLock
 	{
 	public:
+		/**
+		 * Ctor
+		 */
 		ReadWriteLock();
+
+		/**
+		 * dtor
+		 */
 		~ReadWriteLock();
 
 		/**
@@ -61,8 +70,8 @@ namespace memcache
 		Mutex _writeMutex; ///< mutex for allowing only one write thread
 		Event _readEvent; ///< signaled when all readers are done
 		Event _writeEvent; ///< signaled what write is compelte and unsignaled to prevent new readers.
-		IMutex * _readLock;
-		IMutex * _writeLock;
+		IMutex * _readLock;///< helper mutex for only locking/unlocking read
+		IMutex * _writeLock;///< helper mutex for only locking/unlocking write
 	};
 }
 #endif

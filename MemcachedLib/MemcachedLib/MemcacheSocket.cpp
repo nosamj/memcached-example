@@ -170,7 +170,6 @@ namespace memcache
 
 	void MemcacheSocket::Run(const Thread * thread)
 	{
-		std::cout << "[" << _sessionID << "] SelectThread entered" << std::endl;
 		this->SetSockOpts();
 
 		while (!thread->ShouldTerminate() && this->IsConnected())
@@ -214,7 +213,6 @@ namespace memcache
 					int canRead = recv(_socket, peekHeader, kMBPHeaderSize, MSG_PEEK);
 					if (canRead >= kMBPHeaderSize)
 					{
-						std::cout << "MemcacheSocket::Run() There's " << canRead << " bytes of data to be read!" << std::endl;
 						// there's data to be read!
 						this->ReadMessage();
 					}
@@ -223,11 +221,7 @@ namespace memcache
 						// if the select thread signals that we can read but there isn't any data to be read it's
 						// probably becaue the socket has closed gracefully.
 						int error = WSAGetLastError();
-						if (error == 0)
-						{
-							std::cout << "[" << _sessionID << "] Socket has been closed gracefully." << std::endl;
-						}
-						else
+						if (error != 0)
 						{
 							std::cout << "[" << _sessionID << "] Socket has closed with error: " << error << std::endl;
 						}
@@ -243,7 +237,6 @@ namespace memcache
 				break;
 			}
 		}
-		std::cout << "[" << _sessionID << "] SelectThread returning" << std::endl;
 	}
 
 	void MemcacheSocket::ReadMessage()

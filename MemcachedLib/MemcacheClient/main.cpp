@@ -7,6 +7,21 @@
 
 using namespace memcache;
 
+void PrintUsage()
+{
+	std::cout << std::endl << "Usage: MemcacheClient [server_ip] [server_port]" << std::endl;
+	std::cout << "server_ip: IP address of the server to connect to." << std::endl;
+	std::cout << "server_port: port on which the server is listening." << std::endl;
+}
+
+void PrintCommands()
+{
+	std::cout << std::endl << "Supported Commands:" << std::endl;
+	std::cout << "quit: Terminates the application." << std::endl;
+	std::cout << "set: sets the provided value of the provided key on the connected server." << std::endl;
+	std::cout << "get: gets the value of the provided key." << std::endl;
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	MemcacheClient client;
@@ -14,9 +29,20 @@ int _tmain(int argc, _TCHAR* argv[])
 	unsigned short serverPort;
 	WSADATA wsaData;
 
+	if (argc > 1)
+	{
+		std::string arg = argv[1];
+		if ((arg.find("help") != std::string::npos) || (arg.find("?") != std::string::npos))
+		{
+			PrintUsage();
+			return 0;
+		}
+	}
+
 	if (argc < 3)
 	{
 		std::cout << "Not enough parameters!" << std::endl;
+		PrintUsage();
 		return -1;
 	}
 
@@ -38,20 +64,24 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::string command;
 		std::string key;
 		std::string value;
+		std::string flagsStr;
+		PrintCommands();
 		while (command != "quit")
 		{
-			// todo: print commands
+			std::cout << std::endl << "Enter command:";
 			std::cin >> command;
 			if (command == "set")
 			{
 				std::cout << "Enter Key:";
 				std::cin >> key;
+				std::cout << "Enter Flags";
+				std::cin >> flagsStr;
 				std::cout << "Enter Value:";
 				std::cin >> value;
 
 				DataBuffer buffer(value.length());
 				buffer.WriteBytes(value.c_str(), value.length());
-				if (client.Set(key, 0xDEADBEEF, buffer))
+				if (client.Set(key, atoi(flagsStr.c_str()), buffer))
 				{
 					std::cout << "Set successful!" << std::endl;
 				}
@@ -69,12 +99,16 @@ int _tmain(int argc, _TCHAR* argv[])
 
 				if (client.Get(key, valueBuffer, flags))
 				{
-					std::cout << "Get Successful! Value:" << std::string((const char *)valueBuffer.GetData(), valueBuffer.GetBytesWritten()) << std::endl;
+					std::cout << "Flags:" << flags << " Value:" << std::string((const char *)valueBuffer.GetData(), valueBuffer.GetBytesWritten()) << std::endl;
 				}
 				else
 				{
 					std::cout << "Get Failed!" << std::endl;
 				}
+			}
+			else if ((command == "help") || (command.find("?") != std::string::npos))
+			{
+				PrintCommands();
 			}
 		}
 	}

@@ -44,6 +44,8 @@ namespace memcache
 		virtual void OnReceivedMessage(BaseMessage * message, std::unique_ptr<BaseMessage> & reply);
 		virtual void OnSocketClosed(unsigned int sessionID);
 
+		void ClearDataCache();
+		void PrintDataCache();
 	protected:
 		typedef std::map<unsigned int, std::shared_ptr<MemcacheSocket> > SocketMap_t;
 		typedef std::list<std::shared_ptr<MemcacheSocket> > SocketList_t;
@@ -67,7 +69,6 @@ namespace memcache
 	protected:
 		void ProcessClosedSockets();
 		void CloseAllSockets();
-		void ClearDataCache();
 	};
 }
 #endif

@@ -153,7 +153,7 @@ namespace memcache
 							}
 							else
 							{
-								std::cout << "Get(): GetResponse status is an error: " << theRes->GetStatus() << std::endl;
+								std::cout << "Get(): GetResponse status is an error: " << StatusToString(theRes->GetStatus()) << std::endl;
 								_readMsg.reset();
 							}
 						}

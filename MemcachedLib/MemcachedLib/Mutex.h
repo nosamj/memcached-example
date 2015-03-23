@@ -6,13 +6,27 @@
 
 namespace memcache
 {
+
+	/**
+	 * Interface for a simple mutex
+	 */
 	class IMutex
 	{
 	public:
+		/**
+		 * Lock the mutex
+		 */
 		virtual void Lock() = 0;
+
+		/**
+		 * Unlock the mutex
+		 */
 		virtual void Unlock() = 0;
 	};
 
+	/**
+	 * Recursive mutex
+	 */
 	class Mutex : public IMutex
 	{
 	public:
