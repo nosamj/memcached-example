@@ -74,10 +74,11 @@ int _tmain(int argc, _TCHAR* argv[])
 			{
 				std::cout << "Enter Key:";
 				std::cin >> key;
-				std::cout << "Enter Flags";
+				std::cout << "Enter Flags:";
 				std::cin >> flagsStr;
+				std::cin.ignore();
 				std::cout << "Enter Value:";
-				std::cin >> value;
+				std::getline(std::cin, value);
 
 				DataBuffer buffer(value.length());
 				buffer.WriteBytes(value.c_str(), value.length());
