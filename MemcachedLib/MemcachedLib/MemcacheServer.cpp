@@ -98,7 +98,6 @@ namespace memcache
 				GetRequest * theReq = static_cast<GetRequest*>(message);
 				GetResponse * theRes = new GetResponse();
 				reply.reset(theRes);
-				reply->SetKey(theReq->GetKey());
 				DataMap_t::iterator it = _dataMap.find(theReq->GetKey());
 				if (it != _dataMap.end())
 				{

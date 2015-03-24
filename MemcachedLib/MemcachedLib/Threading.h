@@ -6,7 +6,6 @@
 
 namespace memcache
 {
-
 	/**
 	 * Utility class that provides some more controlable threading
 	 * functionality. Such as a common/easy way of telling a thread it should terminate
