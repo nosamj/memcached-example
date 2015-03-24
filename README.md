@@ -68,6 +68,7 @@
     quit: Terminates the application.
     set: sets the provided value of the provided key on the connected server.
     get: gets the value of the provided key.
+    
     Enter command:set
     Enter Key:key1
     Enter Flags:1234
