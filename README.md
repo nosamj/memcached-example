@@ -86,5 +86,5 @@
     Flags:1234 Value:test data 1
     
     Enter command:get
-    Enter Key:key1
-    Flags:1234 Value:test data 1
+    Enter Key:key2
+    Flags:5678 Value:test data 2
