@@ -1,6 +1,6 @@
 # memcached-example
 ## System Requirements
-* Windows 7, 8, 8.1
+* Windows 7, 8, 8.1, Server 2008 R2, Server 2012
 * Visual Studio 2013
 
 ## Build Steps
