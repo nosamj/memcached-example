@@ -14,7 +14,7 @@
 * MemcacheClient
  * Console application for issuing Set and Get commands to the Memcache Server
 * MemcacheServer
- * Console application that listens for incoming TCP connections from Memcache client applications.
+ * Console application that listens for incoming TCP connections from Memcache client applications and hosts the cache where data is stored and fetched.
 * MemcacheUnitTests
  * Console application that executes a series of unit tests testing a variety of components of the MemcacheLib project.
 
